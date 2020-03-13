@@ -167,7 +167,7 @@ export default class CustomSelect extends Vue {
       background: $light-gray;
       color: $vue-blue;
       border-radius: $default-radius $default-radius 0 0;
-      border-bottom: 0;
+      border-bottom-color: transparent;
     }
 
     &__select {
@@ -199,6 +199,7 @@ export default class CustomSelect extends Vue {
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      margin: 0 -1px;
 
       &::-webkit-scrollbar {
         display: none;
