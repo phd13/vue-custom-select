@@ -1,7 +1,7 @@
 <template lang="pug">
-  div(class="custom-dropdown" v-click-outside="hide")
+  .custom-dropdown(v-click-outside="hide")
     slot
-    div(class="custom-dropdown__callee" v-if="hasCallee" @click="toggle")
+    .custom-dropdown__callee(v-if="hasCallee" @click="toggle")
       slot(name="callee")
     transition(name="fade-out")
       div(v-if="computedVisible" :class="dropdownClassList")
@@ -9,18 +9,22 @@
 </template>
 
 <script lang="ts">
-  import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
+  import {
+    Component,
+    Emit,
+    Prop,
+    Vue
+  } from 'vue-property-decorator';
   import clickOutside from "../directives/clickOutside";
 
   @Component({
-    directives: {
-      clickOutside,
-    }
+    directives: { clickOutside }
   })
+
   export default class CustomDropdown extends Vue {
     contentVisible = false;
 
-    @Prop({ default: false }) private visible!: boolean;
+    @Prop({ default: false }) readonly visible!: boolean;
 
     get hasCallee(): boolean {
       return !!this.$slots.callee;
@@ -30,9 +34,9 @@
       return this.$slots.callee ? this.contentVisible : this.visible
     }
 
-    get dropdownClassList(): Array<string | boolean> {
+    get dropdownClassList(): Array <string | false> {
       return [
-        'custom-dropdown__content',
+        'custom-dropdown__content', 
         !this.computedVisible && 'hidden',
       ];
     }

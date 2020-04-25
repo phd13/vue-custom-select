@@ -3,10 +3,10 @@
     CustomSelect(:options="example1")
     CustomSelect(:options="example2")
     CustomSelect(:options="example3")
-    CustomSelect(:options="example4" :label="'name'" :value="'id'")
+    CustomSelect(:options="example4" label="name" value="id")
     CustomSelect(:options="example5")
-    CustomSelect(:options="example6" :label="'title'" :value="'id'")
-    CustomSelect(:options="example7" disabled="true")
+    CustomSelect(:options="example6" label="title" value="id")
+    CustomSelect(:options="example7" :disabled="true")
 </template>
 
 <script lang="ts">
