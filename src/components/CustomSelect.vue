@@ -1,139 +1,127 @@
 <template lang="pug">
   label(:class="computedClassList" @click.prevent="toggle")
-    select(
-      class="custom-select__select"
+    select.custom-select__select(
       @change="selectOption($event.target.value)"
       v-model="selectedOptionValue"
     )
-      option(disabled value="")
-        | {{ placeholderText }}
+      option(disabled value="") {{ placeholderText }}
       option(
-        v-for="(option, index) in parsedOptions"
-        :key="index"
+        v-for="option in parsedOptions"
         :value="option.value"
-      )
-        | {{ option.label }}
-    custom-dropdown(
-      class="custom-select__dropdown"
+      ) {{ option.label }}
+    custom-dropdown.custom-select__dropdown(
       :visibility.sync="dropdownVisible"
     )
       template(slot="callee")
-        span(
-          class="custom-select__placeholder"
+        span.custom-select__placeholder(
           v-if="!selectedOption"
-        )
-          | {{ placeholderText }}
-        span(class="custom-select__name" v-else)
-          | {{ selectedOption }}
-        arrow-icon(:class='iconComputedClassList')
-      ul(
+        ) {{ placeholderText }}
+        span.custom-select__name(v-else) {{ selectedOption }}
+        arrow-icon(:class="iconComputedClassList")
+      ul.custom-select__content(
         v-if="!disabled"
         slot="content"
-        class="custom-select__content"
       )
-        li(
-          class="custom-select__content-item"
-          v-for="(option, index) in parsedOptions"
-          :key="index"
-          @click.stop.self="selectOption(option.label)"
-        )
-          | {{ option.label }}
+        li.custom-select__content-item(
+          v-for="option in parsedOptions"
+          @click.stop.self="selectOption(option.value)"
+        ) {{ option.label }}
 </template>
 
 <script lang="ts">
   import {
-    Component, Emit,
+    Component,
+    Emit,
     Prop,
     Vue,
     Watch,
   } from 'vue-property-decorator';
-import CustomDropdown from './CustomDropdown.vue';
-import ArrowIcon from "@/components/arrow-icon.vue";
+  import CustomDropdown from './CustomDropdown.vue';
+  import ArrowIcon from "@/components/arrow-icon.vue";
   import {
     Options,
-    ParsedOptionArray, Primitive,
+    ParsedOptionArray,
+    Primitive,
   } from "@/typings";
 
-@Component({
-  components: {
-    ArrowIcon,
-    CustomDropdown,
-  },
-})
+  @Component({
+    components: {
+      ArrowIcon,
+      CustomDropdown,
+    },
+  })
 
-export default class CustomSelect extends Vue {
-  dropdownVisible = false;
-  placeholderText = 'Выберите значение';
-  selectedOption: Primitive = '';
-  selectedOptionValue: Primitive = '';
-  parsedOptions: ParsedOptionArray = [];
+  export default class CustomSelect extends Vue {
+    dropdownVisible = false;
+    placeholderText = 'Выберите значение';
+    selectedOption: Primitive = '';
+    selectedOptionValue: Primitive = '';
+    parsedOptions: ParsedOptionArray = [];
 
-  @Prop({
-    required: true,
-    default: []
-  }) private options!: Options;
-  @Prop({ default: false }) public disabled!: boolean;
-  @Prop({ default: 'label' }) private label!: string;
-  @Prop({ default: 'value' }) private value!: string;
+    @Prop({ required: true, default: () => [] }) readonly options!: Options;
+    @Prop({ default: false }) readonly disabled!: boolean;
+    @Prop({ default: 'label' }) readonly label!: string;
+    @Prop({ default: 'value' }) readonly value!: string;
 
-  @Watch('options', { deep: true })
-  onOptionsChanged(val: Options) {
-    this.parsedOptions = [];
-    this.parseOptions(val);
-  }
+    @Watch('options', { deep: true })
 
-  get computedClassList(): Array<string | boolean> {
-    return [
-      'custom-select',
-      this.dropdownVisible && 'custom-select_focus',
-      this.disabled && 'custom-select_disabled',
-    ];
-  }
+    onOptionsChanged(val: Options) {
+      this.parsedOptions = [];
+      this.parseOptions(val);
+    }
 
-  get iconComputedClassList(): Array<string | boolean> {
-    return [
-      'custom-select__icon',
-      this.dropdownVisible && 'custom-select__icon_active',
-    ];
-  }
+    get computedClassList(): Array <string | false> {
+      return [
+        'custom-select',
+        this.dropdownVisible && 'custom-select_focus',
+        this.disabled && 'custom-select_disabled',
+      ];
+    }
 
-  public toggle(): void {
-    if (!this.disabled) {
-      this.dropdownVisible = !this.dropdownVisible;
+    get iconComputedClassList(): Array <string | false> {
+      return [
+        'custom-select__icon',
+        this.dropdownVisible && 'custom-select__icon_active',
+      ];
+    }
+
+    public toggle(): void {
+      if (!this.disabled) {
+        this.dropdownVisible = !this.dropdownVisible;
+      }
+    }
+
+    @Emit('update:value')
+    private selectOption(value: string): Primitive {
+      this.dropdownVisible = false;
+      this.selectedOptionValue = value;
+
+      return this.selectedOption = this.parsedOptions
+        .find(option => option.value === value).label;
+    }
+
+    private parseOptions(options: Options): void {
+      Object.keys(options).map((key) => {
+        const optionKey = options[key];
+
+        if (typeof optionKey !== 'object') {
+          this.parsedOptions.push({
+            label: optionKey.toString(),
+            value: optionKey,
+          });
+        } else {
+          this.parsedOptions.push({
+            label: optionKey[this.label].toString(),
+            value: optionKey[this.value],
+          });
+        }
+      })
+    }
+
+    mounted(): void {
+      this.parseOptions(this.options);
     }
   }
-
-  @Emit('update:value')
-  private selectOption(label: string): Primitive {
-    this.dropdownVisible = false;
-    this.selectedOption = label;
-    return this.selectedOptionValue = this.parsedOptions
-      .find(option => option.label === label).value;
-  }
-
-  private parseOptions(options: Options): void {
-    Object.keys(options).map((key) => {
-      const optionKey = options[key];
-
-      if (typeof optionKey !== 'object') {
-        this.parsedOptions.push({
-          label: optionKey.toString(),
-          value: optionKey,
-        });
-      } else {
-        this.parsedOptions.push({
-          label: optionKey[this.label].toString(),
-          value: optionKey[this.value],
-        });
-      }
-    })
-  }
-
-  mounted(): void {
-    this.parseOptions(this.options);
-  }
-
-}
 </script>
 
 <style scoped lang="scss">
@@ -225,7 +213,7 @@ export default class CustomSelect extends Vue {
     }
 
     &__name,
-    &__placeholder{
+    &__placeholder {
       color: $vue-blue;
       width: 208px;
       display: inline-block;
