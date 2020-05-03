@@ -3,6 +3,7 @@
     select.custom-select__select(
       @change="selectOption($event.target.value)"
       v-model="selectedOptionValue"
+      :disabled="disabled"
     )
       option(disabled value="") {{ placeholderText }}
       option(
@@ -118,6 +119,7 @@
 <style scoped lang="scss">
   .custom-select {
     border: 1px solid $vue-blue;
+    position: relative;
     border-radius: 16px;
     font-size: 16px;
     width: 250px;
