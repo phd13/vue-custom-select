@@ -4,7 +4,7 @@
     .custom-dropdown__callee(v-if="hasCallee" @click="toggle")
       slot(name="callee")
     transition(name="fade-out")
-      div(v-if="computedVisible" :class="dropdownClassList")
+      div(v-if="computedVisible" :class="classList")
         slot(name='content')
 </template>
 
@@ -34,19 +34,19 @@
       return this.$slots.callee ? this.contentVisible : this.visible
     }
 
-    get dropdownClassList(): Array <string | false> {
+    get classList(): Array <string | false> {
       return [
         'custom-dropdown__content', 
         !this.computedVisible && 'hidden',
       ];
     }
 
-    public toggle(): void {
+    private toggle(): void {
       this.contentVisible = !this.contentVisible;
     }
 
     @Emit('update:visibility')
-    hide(): boolean {
+    private hide(): boolean {
       this.contentVisible = false;
       return this.contentVisible;
     }

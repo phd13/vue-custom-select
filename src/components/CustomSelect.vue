@@ -1,5 +1,5 @@
 <template lang="pug">
-  label(:class="computedClassList" @click.prevent="toggle")
+  label(:class="classList" @click.prevent="toggle")
     select.custom-select__select(
       @change="selectOption($event.target.value)"
       v-model="selectedOptionValue"
@@ -17,7 +17,7 @@
           v-if="!selectedOption"
         ) {{ placeholderText }}
         span.custom-select__name(v-else) {{ selectedOption }}
-        arrow-icon(:class="iconComputedClassList")
+        arrow-icon(:class="iconClassList")
       ul.custom-select__content(
         v-if="!disabled"
         slot="content"
@@ -40,7 +40,6 @@
   import ArrowIcon from "@/components/arrow-icon.vue";
   import {
     Options,
-    ParsedOptionArray,
     Primitive,
   } from "@/typings";
 
@@ -56,21 +55,35 @@
     placeholderText = 'Выберите значение';
     selectedOption: Primitive = '';
     selectedOptionValue: Primitive = '';
-    parsedOptions: ParsedOptionArray = [];
 
-    @Prop({ required: true, default: () => [] }) readonly options!: Options;
+    @Prop({ required: true, default: () => Array ([]) }) readonly options!: Options;
     @Prop({ default: false }) readonly disabled!: boolean;
     @Prop({ default: 'label' }) readonly label!: string;
     @Prop({ default: 'value' }) readonly value!: string;
 
     @Watch('options', { deep: true })
 
-    onOptionsChanged(val: Options) {
-      this.parsedOptions = [];
-      this.parseOptions(val);
+    get parsedOptions() {
+      return Object.keys(this.options).reduce((acc, key) => {
+        const optionKey = this.options[key];
+
+        if (typeof optionKey !== 'object') {
+          acc.push({
+            label: optionKey.toString(),
+            value: optionKey,
+          });
+        } else {
+          acc.push({
+            label: optionKey[this.label].toString(),
+            value: optionKey[this.value],
+          });
+        }
+
+        return acc;
+      }, [])
     }
 
-    get computedClassList(): Array <string | false> {
+    get classList(): Array <string | false> {
       return [
         'custom-select',
         this.dropdownVisible && 'custom-select_focus',
@@ -78,14 +91,14 @@
       ];
     }
 
-    get iconComputedClassList(): Array <string | false> {
+    get iconClassList(): Array <string | false> {
       return [
         'custom-select__icon',
         this.dropdownVisible && 'custom-select__icon_active',
       ];
     }
 
-    public toggle(): void {
+    private toggle(): void {
       if (!this.disabled) {
         this.dropdownVisible = !this.dropdownVisible;
       }
@@ -98,28 +111,6 @@
 
       return this.selectedOption = this.parsedOptions
         .find(option => option.value === value).label;
-    }
-
-    private parseOptions(options: Options): void {
-      Object.keys(options).map((key) => {
-        const optionKey = options[key];
-
-        if (typeof optionKey !== 'object') {
-          this.parsedOptions.push({
-            label: optionKey.toString(),
-            value: optionKey,
-          });
-        } else {
-          this.parsedOptions.push({
-            label: optionKey[this.label].toString(),
-            value: optionKey[this.value],
-          });
-        }
-      })
-    }
-
-    mounted(): void {
-      this.parseOptions(this.options);
     }
   }
 </script>
