@@ -108,10 +108,9 @@
     @Emit('update:value')
     private selectOption(value: string): Primitive {
       this.dropdownVisible = false;
-      this.selectedOptionValue = value;
-
-      return this.selectedOption = this.parsedOptions
-        .find(option => option.value === value).label;
+      this.selectedOption = this.parsedOptions
+        .find(option => option.value.toString() === value).label;
+      return this.selectedOptionValue = value;
     }
   }
 </script>
@@ -142,6 +141,7 @@
 
     &_disabled {
       cursor: not-allowed;
+      opacity: .5;
     }
 
     &_focus {
@@ -166,6 +166,7 @@
         background: none;
         border: 0;
         color: transparent;
+        appearance: none;
       }
     }
 
