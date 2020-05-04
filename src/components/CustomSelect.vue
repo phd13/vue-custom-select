@@ -2,7 +2,6 @@
   label(:class="classList" @click.prevent="toggle")
     select.custom-select__select(
       @change="selectOption($event.target.value)"
-      v-model="selectedOptionValue"
       :disabled="disabled"
     )
       option(disabled value="") {{ placeholderText }}
@@ -36,6 +35,7 @@
     Prop,
     Vue,
     Watch,
+    Model,
   } from 'vue-property-decorator';
   import CustomDropdown from './CustomDropdown.vue';
   import ArrowIcon from "@/components/arrow-icon.vue";
@@ -55,7 +55,8 @@
     dropdownVisible = false;
     placeholderText = 'Выберите значение';
     selectedOption: Primitive = '';
-    selectedOptionValue: Primitive = '';
+
+    @Model('select', { type: [String, Number] }) readonly selectedValue!: string;
 
     @Prop({ required: true, default: () => Array ([]) }) readonly options!: Options;
     @Prop({ default: false }) readonly disabled!: boolean;
@@ -105,12 +106,11 @@
       }
     }
 
-    @Emit('update:value')
-    private selectOption(value: string): Primitive {
+    @Emit('select')
+    private selectOption(value: Primitive): void {
       this.dropdownVisible = false;
       this.selectedOption = this.parsedOptions
-        .find(option => option.value.toString() === value).label;
-      return this.selectedOptionValue = value;
+        .find(option => option.value.toString() === value.toString()).label;
     }
   }
 </script>
