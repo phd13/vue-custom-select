@@ -10,7 +10,4 @@ export interface ParsedOption {
   label: string, value: string
 }
 
-export interface ParsedOptionArray extends Array<ParsedOption> {}
-
 export type Primitive = boolean | number | string | symbol;
-

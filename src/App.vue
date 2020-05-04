@@ -1,12 +1,14 @@
 <template lang="pug">
   #app
-    CustomSelect(:options="example1")
-    CustomSelect(:options="example2")
-    CustomSelect(:options="example3")
-    CustomSelect(:options="example4" label="name" value="id")
-    CustomSelect(:options="example5")
-    CustomSelect(:options="example6" label="title" value="id")
-    CustomSelect(:options="example7" :disabled="true")
+    CustomSelect(:options="example1" v-model="selectedValue")
+    CustomSelect(:options="example2" v-model="selectedValue")
+    CustomSelect(:options="example3" v-model="selectedValue")
+    CustomSelect(:options="example4" label="name" value="id" v-model="selectedValue")
+    CustomSelect(:options="example5" v-model="selectedValue")
+    CustomSelect(:options="example6" label="title" value="id" v-model="selectedValue")
+    CustomSelect(:options="example7" :disabled="true" v-model="selectedValue")
+
+    span {{ selectedValue }}
 </template>
 
 <script lang="ts">
@@ -26,6 +28,7 @@
     example5 = { value1: "Option 1", value2: 'Option 2' };
     example6 = { value1: { title: 'Option 1', id: '1' }, value2: { title: "Option 2", id: 2 } };
     example7 = ['disabled'];
+    selectedValue = ''; 
   }
 </script>
 
